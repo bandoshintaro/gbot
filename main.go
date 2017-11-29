@@ -16,19 +16,21 @@ const (
 
 type Config struct {
 	Port         int    `default:80`
-	GithubAPI    string `default:"github.com"`
+	GithubAPI    string `default:"https://api.github.com"`
 	AccessToken  string `required:"true"`
 	Organization string `required:"true"`
 }
 
-var logger = func(method, uri, name string, start time.Time) {
-	log.Printf("method:%q uri:%q name:%q  time:%q", method, uri, name, time.Since(start))
-}
+var (
+	config Config
+	logger = func(method, uri, name string, start time.Time) {
+		log.Printf("method:%q uri:%q name:%q  time:%q", method, uri, name, time.Since(start))
+	}
+)
 
 func main() {
 
-	var c Config
-	err := envconfig.Process("gbot", &c)
+	err := envconfig.Process("gbot", &config)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
