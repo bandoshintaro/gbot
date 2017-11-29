@@ -1,9 +1,12 @@
 package main
 
 import (
-	"net/http"
-
+	"context"
+	"fmt"
+	"github.com/google/go-github/github"
 	"github.com/julienschmidt/httprouter"
+	"golang.org/x/oauth2"
+	"net/http"
 )
 
 func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -14,8 +17,26 @@ func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
 	//owner := config.Organization
-	//token := config.AccessToken
-	//url := config.GithubAPI
+	token := config.AccessToken
+	url := config.GithubAPI
+
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	// enterpriseに対応
+	var client *github.Client
+	if url != "" {
+		client, _ = github.NewEnterpriseClient(url, url, tc)
+	} else {
+		client = github.NewClient(tc)
+	}
+
+	// list all repositories for the authenticated user
+	repos, _, _ := client.Repositories.List(ctx, "", nil)
+	fmt.Println(repos[0].Name)
 
 	/*
 

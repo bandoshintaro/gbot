@@ -9,14 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	defaultPort   = "80"
-	defaultGithub = "github.com"
-)
-
 type Config struct {
-	Port         int    `default:80`
-	GithubAPI    string `default:"https://api.github.com"`
+	Port         int `default:80`
+	GithubAPI    string
 	AccessToken  string `required:"true"`
 	Organization string `required:"true"`
 }
