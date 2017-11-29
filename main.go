@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
