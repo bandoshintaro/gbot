@@ -34,14 +34,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	port := ":" + string(config.Port)
 
-	log.Println("starting github bot with ", Port, "...")
+	log.Println("starting github bot with ", config.Port, "...")
 	router := httprouter.New()
 
 	router.GET("/", Logging(Healthcheck, "healhcheck"))
 	router.GET("/webhook", Logging(Webhook, "organization"))
 
-	log.Fatal(http.ListenAndServe(Port, router))
+	log.Fatal(http.ListenAndServe(port, router))
 
 }
 

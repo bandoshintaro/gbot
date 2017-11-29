@@ -13,9 +13,9 @@ func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
-	owner := config.Organization
-	token := config.AccessToken
-	url := config.GithubAPI
+	//owner := config.Organization
+	//token := config.AccessToken
+	//url := config.GithubAPI
 
 	/*
 
