@@ -18,7 +18,7 @@ func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
 	var issue github.IssuesEvent
-	_ := json.Unmarshal(body, &issue)
+	json.Unmarshal(body, &issue)
 	//owner := config.Organization
 	token := config.AccessToken
 	url := config.GithubAPI
