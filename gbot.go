@@ -19,7 +19,7 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
 	//var issue github.IssuesEvent
 	//json.Unmarshal(body, &issue)
-	//owner := config.Organization
+	owner := config.Organization
 	token := config.AccessToken
 	url := config.GithubAPI
 
@@ -37,9 +37,14 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 		client = github.NewClient(tc)
 	}
 
-	repos, _, _ := client.Repositories.List(ctx, "", nil)
+	//repos, _, _ := client.Repositories.List(ctx, "", nil)
+	repos, _, _ := client.Repositories.ListByOrg(ctx, owner, nil)
 	for _, repo := range repos {
 		log.Info(*repo.Name)
+	}
+	members, _, _ := client.Organizations.ListMembers(ctx, owner, nil)
+	for _, member := range members {
+		log.Info(*member.Name)
 	}
 
 	/*
