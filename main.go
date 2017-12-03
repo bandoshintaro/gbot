@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Port         int `default:80`
+	Port         string `default:"8080"`
 	GithubAPI    string
 	AccessToken  string `required:"true"`
 	Organization string `required:"true"`
@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	port := ":" + string(config.Port)
+	port := ":" + config.Port
 
 	log.Println("starting github bot with ", config.Port, "...")
 	router := httprouter.New()

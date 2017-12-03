@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	//	"encoding/json"
 	"github.com/google/go-github/github"
 	"github.com/julienschmidt/httprouter"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"net/http"
 )
@@ -17,8 +17,8 @@ func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
-	var issue github.IssuesEvent
-	json.Unmarshal(body, &issue)
+	//var issue github.IssuesEvent
+	//json.Unmarshal(body, &issue)
 	//owner := config.Organization
 	token := config.AccessToken
 	url := config.GithubAPI
@@ -37,9 +37,10 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 		client = github.NewClient(tc)
 	}
 
-	// list all repositories for the authenticated user
 	repos, _, _ := client.Repositories.List(ctx, "", nil)
-	fmt.Println(repos[0].Name)
+	for _, repo := range repos {
+		log.Info(*repo.Name)
+	}
 
 	/*
 
