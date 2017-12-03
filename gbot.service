@@ -1,0 +1,12 @@
+[Unit]
+Description=organization invite bot
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/default/gbot
+ExecStart=/usr/local/bin/gbot
+Delegate=yes
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
