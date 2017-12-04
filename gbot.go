@@ -24,15 +24,15 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 		log.Error(err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	if hc.Event == "issue" {
+	if hc.Event == "issues" {
 		event := github.IssueCommentEvent{}
 		if err := json.Unmarshal(hc.Payload, &event); err != nil {
 			log.Error(err)
 		}
 
 		issue := event.GetIssue()
-		//username := issue.GetUser().GetName()
-		repo := issue.GetRepository().GetName()
+		username := issue.GetUser().GetLogin()
+		repo := event.GetRepo().GetName()
 		number := issue.GetNumber()
 
 		owner := config.Organization
@@ -52,81 +52,30 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 		} else {
 			client = github.NewClient(tc)
 		}
-		tmp := "テスト"
-		comment := &github.IssueComment{Body: &tmp}
-		_, _, err = client.Issues.CreateComment(ctx, owner, repo, number, comment)
-		if err != nil {
-			log.Error(err)
+		ismember, _, _ := client.Organizations.IsMember(ctx, owner, username)
+		if !ismember {
+			log.Info(username, " is already member of ", owner)
+		} else {
+
+			tmp := "Organizationに招待しました"
+			state := "admin"
+			comment := &github.IssueComment{Body: &tmp}
+			_, _, err = client.Issues.CreateComment(ctx, owner, repo, number, comment)
+			if err != nil {
+				log.Error(err)
+			}
+			_, _, err = client.Organizations.EditOrgMembership(ctx, username, owner, &github.Membership{State: &state})
+			if err != nil {
+				log.Error(err)
+			}
+			issue_state := "closed"
+			_, _, err = client.Issues.Edit(ctx, owner, repo, number, &github.IssueRequest{State: &issue_state})
+			if err != nil {
+				log.Error(err)
+			}
+
 		}
 	}
-	/*
-		ismember, _, _ := client.Organizations.isMember(ctx, owner, username, nil)
-
-		if ismember {
-			log.Info(username, "is already member of", owner)
-			return nil
-		}
-		_, _, err = client.Organizations.EditOrgMembership(ctx, username, owner, &github.Membership)
-		if err != nil {
-			log.Error(err)
-			return nil
-		}
-	*/
-
-	/*
-
-	   #issueを作るとorganizationに自動招待
-	   robot.router.post "/github/organization-invite-webhook", (req, res) ->
-
-	       # https://developer.github.com/v3/activity/events/types/#issuesevent
-	       data = JSON.parse(req.body.payload)
-
-	       #open以外は何もしない
-	       if data.action not in ["opened"]
-	           return res.end ""
-
-	       url = require('url')
-	       issue = data.issue
-	       user = issue.user
-	       invited_user = user.login
-
-	       # https://developer.github.com/v3/orgs/members/#members-list
-	       member_url = "#{url_api_base}/orgs/#{owner}/members"
-	       github.get member_url, (members, error) ->
-	           og_member = []
-
-	           for member, i in members
-	               og_member.push member.login
-
-	           if invited_user not in og_member
-	               repo = data.repository.name
-	               number = issue.number
-
-	               # issueにコメント
-	               url = "#{url_api_base}/repos/#{owner}/#{repo}/issues/#{number}/comments"
-	               data = { "repo": repo, "number": number, "body":"ようこそ！" }
-	               github.post url, data, (body, error) ->
-	                    console.log(error)
-	                    res.end ""
-
-	               # ユーザー招待のリクエストを送信
-	               url = "#{url_api_base}/orgs/#{owner}/memberships/#{invited_user}"
-	               github.put url, (body, error) ->
-	                    console.log(error)
-	                    res.end ""
-
-	           #既にmemberになってたら何もしない
-	           else
-	               res.end ""
-	*/
-	//js, err := json.Marshal(genes)
-
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
-
-	//w.Write(js)
 }
 
 type HookContext struct {
