@@ -35,7 +35,7 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", Logging(Healthcheck, "healhcheck"))
-	router.GET("/webhook", Logging(Webhook, "organization"))
+	router.POST("/webhook", Logging(Webhook, "organization"))
 
 	log.Fatal(http.ListenAndServe(port, router))
 

@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
-	//	"encoding/json"
+	"encoding/json"
+	"errors"
 	"github.com/google/go-github/github"
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -17,35 +19,59 @@ func Healthcheck(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 
-	//var issue github.IssuesEvent
-	//json.Unmarshal(body, &issue)
-	owner := config.Organization
-	token := config.AccessToken
-	url := config.GithubAPI
-
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	// enterpriseに対応
-	var client *github.Client
-	if url != "" {
-		client, _ = github.NewEnterpriseClient(url, url, tc)
-	} else {
-		client = github.NewClient(tc)
+	hc, err := ParseHook(r)
+	if err != nil {
+		log.Error(err)
 	}
+	w.Header().Set("Content-Type", "application/json")
+	if hc.Event == "issue" {
+		event := github.IssueCommentEvent{}
+		if err := json.Unmarshal(hc.Payload, &event); err != nil {
+			log.Error(err)
+		}
 
-	//repos, _, _ := client.Repositories.List(ctx, "", nil)
-	repos, _, _ := client.Repositories.ListByOrg(ctx, owner, nil)
-	for _, repo := range repos {
-		log.Info(*repo.Name)
+		issue := event.GetIssue()
+		//username := issue.GetUser().GetName()
+		repo := issue.GetRepository().GetName()
+		number := issue.GetNumber()
+
+		owner := config.Organization
+		token := config.AccessToken
+		url := config.GithubAPI
+
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		tc := oauth2.NewClient(ctx, ts)
+
+		// enterpriseに対応
+		var client *github.Client
+		if url != "" {
+			client, _ = github.NewEnterpriseClient(url, url, tc)
+		} else {
+			client = github.NewClient(tc)
+		}
+		tmp := "テスト"
+		comment := &github.IssueComment{Body: &tmp}
+		_, _, err = client.Issues.CreateComment(ctx, owner, repo, number, comment)
+		if err != nil {
+			log.Error(err)
+		}
 	}
-	members, _, _ := client.Organizations.ListMembers(ctx, owner, nil)
-	for _, member := range members {
-		log.Info(*member.Name)
-	}
+	/*
+		ismember, _, _ := client.Organizations.isMember(ctx, owner, username, nil)
+
+		if ismember {
+			log.Info(username, "is already member of", owner)
+			return nil
+		}
+		_, _, err = client.Organizations.EditOrgMembership(ctx, username, owner, &github.Membership)
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
+	*/
 
 	/*
 
@@ -100,6 +126,36 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 	//	return
 	//}
 
-	w.Header().Set("Content-Type", "application/json")
 	//w.Write(js)
+}
+
+type HookContext struct {
+	Event   string
+	Id      string
+	Payload []byte
+}
+
+func ParseHook(req *http.Request) (*HookContext, error) {
+	hc := HookContext{}
+
+	if hc.Event = req.Header.Get("x-github-event"); len(hc.Event) == 0 {
+		return nil, errors.New("No event!")
+	}
+
+	if hc.Id = req.Header.Get("x-github-delivery"); len(hc.Id) == 0 {
+		return nil, errors.New("No event Id!")
+	}
+
+	body, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	hc.Payload = body
+	if err != nil {
+		return nil, err
+	}
+
+	return &hc, nil
 }
