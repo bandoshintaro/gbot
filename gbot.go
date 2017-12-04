@@ -53,7 +53,7 @@ func Webhook(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 			client = github.NewClient(tc)
 		}
 		ismember, _, _ := client.Organizations.IsMember(ctx, owner, username)
-		if !ismember {
+		if ismember {
 			log.Info(username, " is already member of ", owner)
 		} else {
 
