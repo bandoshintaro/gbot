@@ -2,6 +2,6 @@ version: "3"
 
 services:
     gbot:
-        build: ./
+        image: bando/gbot
         ports:
           - 8080:80
