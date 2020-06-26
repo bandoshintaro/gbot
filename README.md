@@ -1,29 +1,20 @@
 # gbot
 
-issueを作ると自動でorganizationに招待してくれるやつ
+This is application to invite a user into your organization.
 
-## 使い方
+## Usage
 
-### webhookの設定
+- add webhook to your organization
+  - check 'issue comments'
+  - add '/webook' to PayloadURL
+- create your Personal access token
+- start gbot
 
-- githubの設定画面でissueイベントにチェックをつけた上で、このurlでwebhookを設定する
-
+## Configuration
 ```
-[hostname]:8080/webhook
-```
-
-### botに使うtokenを作成
-
-- organizationへの権限を持つアカウントでpersonal access tokenを作る
-
-### botを起動
-
-使用できる環境変数
-
-```
-GBOT_PORT          #gbotを起動するポート番号、デフォルトは8080
-GBOT_GITHUBAPI     #Github Enterprise用の設定、github.comの場合は不要
-GBOT_ACCESSTOKEN   #認証に使用するPersonal Access Token
-GBOT_ORGANIZATION  #招待したいOrganization
+GBOT_PORT          #default: 8080
+GBOT_GITHUBAPI     #if you use Github Enterprise, you should set this variable.
+GBOT_ACCESSTOKEN   #your personal access token
+GBOT_ORGANIZATION  #your organization
 ```
 

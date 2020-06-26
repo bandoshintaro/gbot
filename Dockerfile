@@ -1,5 +1,4 @@
-FROM golang:1.9.2-alpine as builder
-MAINTAINER bando-shintaro<bando142141@gmail.com>
+FROM golang:1.14-alpine as builder
 
 ENV APP_DIR=/go/src/github.com/bandoshintaro/gbot
 

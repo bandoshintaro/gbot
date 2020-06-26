@@ -1,0 +1,42 @@
+# github.com/golang/protobuf v0.0.0-20171113180720-1e59b77b52bf
+## explicit
+github.com/golang/protobuf/proto
+# github.com/google/go-github v14.0.1-0.20171126021131-a89ea1cdf799+incompatible
+## explicit
+github.com/google/go-github/github
+# github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+## explicit
+github.com/google/go-querystring/query
+# github.com/julienschmidt/httprouter v1.1.0
+## explicit
+github.com/julienschmidt/httprouter
+# github.com/kelseyhightower/envconfig v1.3.0
+## explicit
+github.com/kelseyhightower/envconfig
+# github.com/sirupsen/logrus v1.0.3
+## explicit
+github.com/sirupsen/logrus
+# golang.org/x/crypto v0.0.0-20171127230003-365904b0f315
+## explicit
+golang.org/x/crypto/ssh/terminal
+# golang.org/x/net v0.0.0-20171129192339-a8b929477797
+## explicit
+golang.org/x/net/context
+golang.org/x/net/context/ctxhttp
+# golang.org/x/oauth2 v0.0.0-20171117235251-f95fa95eaa93
+## explicit
+golang.org/x/oauth2
+golang.org/x/oauth2/internal
+# golang.org/x/sys v0.0.0-20171127190827-a204229cd828
+## explicit
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# google.golang.org/appengine v1.0.0
+## explicit
+google.golang.org/appengine/internal
+google.golang.org/appengine/internal/base
+google.golang.org/appengine/internal/datastore
+google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/remote_api
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/urlfetch
